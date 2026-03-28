@@ -1,109 +1,106 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, Send, Sparkles, TrendingUp } from "lucide-react";
+import { Bot, Send, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
 }
 
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
+
 const QUICK_PROMPTS = [
   "What is Monad blockchain?",
   "Should I buy BTC now?",
   "Explain DeFi in simple terms",
   "Best crypto trading strategies",
+  "What is Web3?",
+  "How does staking work?",
 ];
 
-const AI_RESPONSES: Record<string, string> = {
-  "monad": `## Monad Blockchain 🔮
+async function streamChat({
+  messages,
+  onDelta,
+  onDone,
+  onError,
+}: {
+  messages: Message[];
+  onDelta: (text: string) => void;
+  onDone: () => void;
+  onError: (err: string) => void;
+}) {
+  try {
+    const resp = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ messages }),
+    });
 
-Monad is a **high-performance Layer 1 blockchain** designed for EVM compatibility with massively parallel execution.
+    if (!resp.ok) {
+      const errData = await resp.json().catch(() => ({ error: "Request failed" }));
+      onError(errData.error || `Error ${resp.status}`);
+      return;
+    }
 
-### Key Features:
-- **10,000+ TPS** throughput with sub-second finality
-- **Full EVM bytecode compatibility** — deploy existing Solidity contracts
-- **Parallel execution** — processes transactions concurrently
-- **MonadBFT** consensus mechanism for security
-- **Optimistic concurrency control** for state access
+    if (!resp.body) {
+      onError("No response body");
+      return;
+    }
 
-### Why It Matters:
-Monad solves the blockchain trilemma by achieving high throughput without sacrificing decentralization. It's positioned as the next-gen DeFi infrastructure.
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
 
-*Current market sentiment: Bullish — strong developer adoption and growing ecosystem.*`,
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
 
-  "buy": `## BTC Market Analysis 📊
+      let idx: number;
+      while ((idx = buffer.indexOf("\n")) !== -1) {
+        let line = buffer.slice(0, idx);
+        buffer = buffer.slice(idx + 1);
+        if (line.endsWith("\r")) line = line.slice(0, -1);
+        if (!line.startsWith("data: ")) continue;
 
-Based on current technical indicators:
+        const json = line.slice(6).trim();
+        if (json === "[DONE]") {
+          onDone();
+          return;
+        }
 
-| Indicator | Signal |
-|-----------|--------|
-| RSI (14) | 52.3 — Neutral |
-| MACD | Bullish crossover forming |
-| 200 EMA | Price above — Bullish |
-| Volume | Increasing — Positive |
-
-### AI Recommendation: **HOLD / Cautious BUY** 🟡
-
-**Reasoning:** BTC is showing consolidation above key support at $65,000. Wait for a confirmed breakout above $68,500 for a stronger entry. Set stop-loss at $63,000.
-
-⚠️ *This is AI analysis, not financial advice. Always DYOR.*`,
-
-  "defi": `## DeFi Explained Simply 🏦
-
-**DeFi = Decentralized Finance** — banking without banks!
-
-### Think of it like this:
-1. **Lending** — Earn interest by lending your crypto (like a savings account)
-2. **Borrowing** — Use crypto as collateral to borrow funds
-3. **Trading** — Swap tokens directly, no middleman (DEXs)
-4. **Yield Farming** — Earn rewards for providing liquidity
-5. **Staking** — Lock tokens to secure the network and earn rewards
-
-### Popular DeFi Protocols:
-- 🦄 **Uniswap** — Token swapping
-- 👻 **Aave** — Lending/borrowing
-- 🏗️ **MakerDAO** — Stablecoin (DAI)
-
-*Start with small amounts and always understand the risks!*`,
-
-  "default": `## AI Trading Insights 🤖
-
-I've analyzed the current market conditions:
-
-### Market Summary:
-- **BTC Dominance**: 52.3% — Altseason not yet triggered
-- **Fear & Greed Index**: 65 (Greed)
-- **Total Market Cap**: $2.4T (+2.1%)
-
-### Top Strategies Right Now:
-1. **Dollar-Cost Averaging** into BTC and ETH
-2. **Swing trading** SOL on 4H timeframe
-3. **Watch Monad** for potential early entry
-
-### Risk Alerts:
-⚠️ High volatility expected around upcoming FOMC meeting
-⚠️ Monitor BTC $65K support level
-
-*Ask me anything about specific tokens, strategies, or market analysis!*`,
-};
-
-function getResponse(input: string): string {
-  const lower = input.toLowerCase();
-  if (lower.includes("monad")) return AI_RESPONSES["monad"];
-  if (lower.includes("buy") || lower.includes("btc") || lower.includes("sell")) return AI_RESPONSES["buy"];
-  if (lower.includes("defi") || lower.includes("simple")) return AI_RESPONSES["defi"];
-  if (lower.includes("strateg")) return AI_RESPONSES["default"];
-  return AI_RESPONSES["default"];
+        try {
+          const parsed = JSON.parse(json);
+          const content = parsed.choices?.[0]?.delta?.content;
+          if (content) onDelta(content);
+        } catch {
+          buffer = line + "\n" + buffer;
+          break;
+        }
+      }
+    }
+    onDone();
+  } catch (err) {
+    onError(err instanceof Error ? err.message : "Connection failed");
+  }
 }
 
 export default function AIChatPanel() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hey! I'm your **NexTrade AI Assistant** 🤖\n\nI can help you with:\n- 📊 Market analysis & trading signals\n- 🔮 Monad blockchain insights\n- 📚 Crypto education\n- 💡 Strategy recommendations\n\nWhat would you like to know?" },
+    {
+      role: "assistant",
+      content:
+        "Hey! I'm **MonX AI** 🤖\n\nI can help you with:\n- 📊 Real-time market analysis & trading signals\n- 🔮 Monad blockchain deep dives\n- 📚 Crypto & Web3 education\n- 💡 Strategy recommendations\n- 🌐 Any question — I search globally!\n\nWhat would you like to know?",
+    },
   ]);
   const [input, setInput] = useState("");
-  const [typing, setTyping] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -111,16 +108,35 @@ export default function AIChatPanel() {
   }, [messages]);
 
   const send = (text: string) => {
-    if (!text.trim()) return;
+    if (!text.trim() || isStreaming) return;
     const userMsg: Message = { role: "user", content: text };
-    setMessages((prev) => [...prev, userMsg]);
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     setInput("");
-    setTyping(true);
+    setIsStreaming(true);
 
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { role: "assistant", content: getResponse(text) }]);
-      setTyping(false);
-    }, 1000 + Math.random() * 1000);
+    let assistantSoFar = "";
+
+    streamChat({
+      messages: updatedMessages,
+      onDelta: (chunk) => {
+        assistantSoFar += chunk;
+        setMessages((prev) => {
+          const last = prev[prev.length - 1];
+          if (last?.role === "assistant" && prev.length > updatedMessages.length) {
+            return prev.map((m, i) =>
+              i === prev.length - 1 ? { ...m, content: assistantSoFar } : m
+            );
+          }
+          return [...prev, { role: "assistant", content: assistantSoFar }];
+        });
+      },
+      onDone: () => setIsStreaming(false),
+      onError: (err) => {
+        toast.error(err);
+        setIsStreaming(false);
+      },
+    });
   };
 
   return (
@@ -130,8 +146,10 @@ export default function AIChatPanel() {
           <Bot className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h2 className="text-xl font-bold">AI Assistant</h2>
-          <p className="text-xs text-muted-foreground">Powered by advanced market intelligence</p>
+          <h2 className="text-xl font-bold">MonX AI Assistant</h2>
+          <p className="text-xs text-muted-foreground">
+            Powered by advanced AI — ask anything
+          </p>
         </div>
       </div>
 
@@ -144,11 +162,13 @@ export default function AIChatPanel() {
               animate={{ opacity: 1, y: 0 }}
               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
-              <div className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
-                msg.role === "user"
-                  ? "bg-primary text-primary-foreground rounded-br-md"
-                  : "glass-card rounded-bl-md"
-              }`}>
+              <div
+                className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
+                  msg.role === "user"
+                    ? "bg-primary text-primary-foreground rounded-br-md"
+                    : "glass-card rounded-bl-md"
+                }`}
+              >
                 <div className="prose prose-sm prose-invert max-w-none">
                   <ReactMarkdown>{msg.content}</ReactMarkdown>
                 </div>
@@ -156,10 +176,14 @@ export default function AIChatPanel() {
             </motion.div>
           ))}
         </AnimatePresence>
-        {typing && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 text-muted-foreground text-sm">
-            <Sparkles className="w-4 h-4 animate-pulse-glow text-primary" />
-            AI is thinking...
+        {isStreaming && messages[messages.length - 1]?.role !== "assistant" && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center gap-2 text-muted-foreground text-sm"
+          >
+            <Loader2 className="w-4 h-4 animate-spin text-primary" />
+            MonX AI is thinking...
           </motion.div>
         )}
         <div ref={bottomRef} />
@@ -171,7 +195,8 @@ export default function AIChatPanel() {
             <button
               key={p}
               onClick={() => send(p)}
-              className="text-xs px-3 py-1.5 rounded-full glass-card text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors"
+              disabled={isStreaming}
+              className="text-xs px-3 py-1.5 rounded-full glass-card text-muted-foreground hover:text-foreground hover:border-primary/30 transition-colors disabled:opacity-50"
             >
               {p}
             </button>
@@ -182,11 +207,21 @@ export default function AIChatPanel() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send(input)}
-            placeholder="Ask about crypto, trading, or Monad..."
+            placeholder="Ask anything — crypto, markets, tech, or general knowledge..."
             className="flex-1 bg-secondary rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/50 placeholder:text-muted-foreground"
+            disabled={isStreaming}
           />
-          <Button onClick={() => send(input)} size="icon" className="bg-primary text-primary-foreground rounded-xl h-[46px] w-[46px] hover:bg-primary/90">
-            <Send className="w-4 h-4" />
+          <Button
+            onClick={() => send(input)}
+            size="icon"
+            className="bg-primary text-primary-foreground rounded-xl h-[46px] w-[46px] hover:bg-primary/90"
+            disabled={isStreaming}
+          >
+            {isStreaming ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
           </Button>
         </div>
       </div>
