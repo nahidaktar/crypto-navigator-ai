@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Bot, TrendingUp, BookOpen, Wallet, BarChart3, Sparkles, Zap, Shield, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.jpg";
-import SplashScreen from "@/components/SplashScreen";
 
 const FEATURES = [
   { icon: Bot, title: "AI Trading Agent", desc: "Real-time signals, technical analysis & automated insights powered by advanced AI" },
@@ -21,23 +19,7 @@ export default function LandingPage({ onGetStarted }: { onGetStarted: () => void
     setShowSplash(true);
   };
 
-  const handleSplashDone = () => {
-    setShowSplash(false);
-    onGetStarted();
-  };
-
   return (
-    <>
-      {showSplash && <SplashScreen onComplete={handleSplashDone} />}
-      <div className="min-h-screen bg-background relative overflow-hidden">
-        {/* Background effects */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full opacity-20"
-            style={{ background: "radial-gradient(circle, hsl(162 78% 50% / 0.15), transparent 70%)" }} />
-          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full opacity-20"
-            style={{ background: "radial-gradient(circle, hsl(265 80% 65% / 0.12), transparent 70%)" }} />
-        </div>
-
         {/* Nav */}
         <header className="relative z-10 flex items-center justify-between px-8 py-5">
           <div className="flex items-center gap-3">
