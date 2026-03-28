@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
-import { Sparkles, Zap, Shield, Globe, Code, ArrowUpRight } from "lucide-react";
+import { Sparkles, Zap, Shield, Globe, Code, ArrowUpRight, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FEATURES = [
-  { icon: Zap, title: "10,000+ TPS", desc: "Massively parallel transaction processing" },
-  { icon: Shield, title: "MonadBFT", desc: "Byzantine fault-tolerant consensus" },
-  { icon: Code, title: "EVM Compatible", desc: "Deploy existing Solidity contracts" },
-  { icon: Globe, title: "Decentralized", desc: "True decentralization at scale" },
+  { icon: Zap, title: "10,000+ TPS", desc: "Massively parallel transaction processing with pipelined execution" },
+  { icon: Shield, title: "MonadBFT", desc: "Byzantine fault-tolerant consensus with optimistic execution" },
+  { icon: Code, title: "EVM Compatible", desc: "Deploy existing Solidity contracts seamlessly" },
+  { icon: Globe, title: "Decentralized", desc: "True decentralization with low hardware requirements" },
 ];
 
 const ECOSYSTEM = [
@@ -14,6 +14,13 @@ const ECOSYSTEM = [
   { name: "MonadLend", type: "Lending", status: "Testnet" },
   { name: "MonadNFT", type: "NFT Marketplace", status: "Coming Soon" },
   { name: "MonadBridge", type: "Cross-chain", status: "Live" },
+];
+
+const MONAD_INFO = [
+  { q: "What is Monad?", a: "Monad is a next-generation Layer 1 blockchain that achieves massive scalability through parallel execution of transactions while maintaining full EVM compatibility." },
+  { q: "Parallel Execution", a: "Unlike Ethereum which processes transactions sequentially, Monad executes transactions in parallel using optimistic concurrency control, achieving 10,000+ TPS." },
+  { q: "MonadBFT Consensus", a: "Monad uses a pipelined HotStuff-based BFT consensus mechanism that allows block production to overlap with execution for maximum throughput." },
+  { q: "MonadDB", a: "Custom state database with async I/O, SSD-optimized Merkle trie storage that reduces state access bottlenecks common in other blockchains." },
 ];
 
 export default function MonadPanel() {
@@ -32,32 +39,50 @@ export default function MonadPanel() {
             </div>
           </div>
           <p className="text-sm text-muted-foreground max-w-2xl mb-4">
-            Monad is a high-performance Layer 1 blockchain achieving 10,000+ TPS through parallel execution
-            while maintaining full EVM compatibility. Build the future of DeFi on Monad.
+            Monad is a high-performance Layer 1 blockchain achieving 10,000+ TPS through parallel execution,
+            pipelined consensus, and MonadDB — while maintaining full EVM compatibility. It's designed to bring
+            Ethereum-level decentralization with Solana-level speed.
           </p>
-          <div className="flex gap-3">
-            <Button className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent">
-              <Sparkles className="w-4 h-4 mr-2" /> Explore Monad
-            </Button>
-            <Button variant="outline">View Docs</Button>
+          <div className="flex gap-3 flex-wrap">
+            <a href="https://app.monad.xyz/" target="_blank" rel="noopener noreferrer">
+              <Button className="bg-accent text-accent-foreground hover:bg-accent/90 glow-accent gap-2">
+                <Sparkles className="w-4 h-4" /> Open Monad App <ExternalLink className="w-3 h-3" />
+              </Button>
+            </a>
+            <a href="https://docs.monad.xyz/" target="_blank" rel="noopener noreferrer">
+              <Button variant="outline" className="gap-2">
+                View Docs <ExternalLink className="w-3 h-3" />
+              </Button>
+            </a>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {FEATURES.map((f, i) => (
-          <motion.div
-            key={f.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="glass-card p-4 space-y-2"
-          >
+          <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
+            className="glass-card p-4 space-y-2">
             <f.icon className="w-5 h-5 text-accent" />
             <p className="font-bold text-sm">{f.title}</p>
             <p className="text-xs text-muted-foreground">{f.desc}</p>
           </motion.div>
         ))}
+      </div>
+
+      {/* Deep Dive */}
+      <div className="glass-card p-6 space-y-4">
+        <h3 className="font-bold flex items-center gap-2">
+          <Code className="w-5 h-5 text-accent" /> Monad Deep Dive
+        </h3>
+        <div className="grid gap-3 md:grid-cols-2">
+          {MONAD_INFO.map((item, i) => (
+            <motion.div key={item.q} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.1 }}
+              className="p-4 rounded-lg bg-secondary/50 space-y-1">
+              <p className="text-sm font-semibold text-accent">{item.q}</p>
+              <p className="text-xs text-muted-foreground">{item.a}</p>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       <div className="glass-card p-6 space-y-4">
