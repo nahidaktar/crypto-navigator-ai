@@ -58,21 +58,7 @@ export default function LandingPage({ onGetStarted }: { onGetStarted: () => void
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-          >
-            <div className="relative mb-6">
-              <motion.div
-                className="absolute inset-[-6px] rounded-full"
-                style={{
-                  background: "conic-gradient(from 0deg, hsl(162 78% 50%), hsl(265 80% 65%), hsl(185 80% 55%), hsl(162 78% 50%))",
-                  filter: "blur(8px)",
-                }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-              />
-              <div className="relative w-20 h-20 rounded-full border-2 border-border/50 overflow-hidden bg-background mx-auto">
-                <img src={logo} alt="MonX" className="w-full h-full object-cover" />
-              </div>
-            </div>
+          
           
             <p className="text-sm text-muted-foreground/70 max-w-lg mx-auto mb-8">
               Real-time market analytics • AI agent workflows • Monad ecosystem • Gamified learning
