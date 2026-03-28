@@ -4,12 +4,15 @@ import {
   BarChart3, Bot, BookOpen, Wallet, History, TrendingUp,
   Settings, ChevronLeft, ChevronRight, LayoutDashboard, Sparkles
 } from "lucide-react";
+import UserProfileMenu from "@/components/UserProfileMenu";
+import logo from "@/assets/logo.jpg";
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "trading", label: "AI Trading", icon: TrendingUp },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "portfolio", label: "Portfolio", icon: Wallet },
+  { id: "wallet", label: "Wallet", icon: Wallet },
   { id: "history", label: "History", icon: History },
   { id: "learn", label: "Learn & Earn", icon: BookOpen },
   { id: "ai-chat", label: "AI Assistant", icon: Bot },
@@ -34,13 +37,12 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
           <AnimatePresence>
             {!collapsed && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-primary" />
-                </div>
-                <span className="text-lg font-bold text-gradient">NexTrade</span>
+                <img src={logo} alt="MonX" className="w-8 h-8 rounded-lg" />
+                <span className="text-lg font-bold text-gradient">MonX</span>
               </motion.div>
             )}
           </AnimatePresence>
+          {collapsed && <img src={logo} alt="MonX" className="w-8 h-8 rounded-lg" />}
           <button onClick={() => setCollapsed(!collapsed)} className="p-1.5 rounded-lg hover:bg-secondary transition-colors text-muted-foreground">
             {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
@@ -73,7 +75,12 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         </nav>
       </div>
 
-      <div className="p-3">
+      <div className="p-3 space-y-2">
+        {!collapsed && (
+          <div className="px-3 py-2">
+            <UserProfileMenu />
+          </div>
+        )}
         <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-secondary transition-colors text-sm">
           <Settings className="w-5 h-5 flex-shrink-0" />
           {!collapsed && <span>Settings</span>}

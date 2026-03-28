@@ -9,12 +9,14 @@ import LearnPanel from "@/components/LearnPanel";
 import AIChatPanel from "@/components/AIChatPanel";
 import MonadPanel from "@/components/MonadPanel";
 import MarketOverview from "@/components/MarketOverview";
+import WalletPanel from "@/components/WalletPanel";
 
 const PANELS: Record<string, React.FC> = {
   dashboard: DashboardHome,
   trading: AITradingPanel,
   analytics: AnalyticsPanel,
   portfolio: PortfolioPanel,
+  wallet: WalletPanel,
   history: HistoryPanel,
   learn: LearnPanel,
   "ai-chat": AIChatPanel,
