@@ -21,6 +21,7 @@ function StatCard({ icon: Icon, label, value, sub, accent }: { icon: any; label:
 
 export default function DashboardHome() {
   const [topCoins, setTopCoins] = useState<CryptoPrice[]>([]);
+  const [displayName, setDisplayName] = useState("Trader");
 
   useEffect(() => {
     setTopCoins(getMarketData().slice(0, 6));
@@ -28,12 +29,26 @@ export default function DashboardHome() {
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    import("@/integrations/supabase/client").then(async ({ supabase }) => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("user_id", session.user.id)
+          .single();
+        if (data?.display_name) setDisplayName(data.display_name);
+      }
+    });
+  }, []);
+
   const signal = getAISignal("BTC");
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Welcome back, Trader</h1>
+        <h1 className="text-3xl font-bold">Welcome back, {displayName}</h1>
         <p className="text-muted-foreground text-sm mt-1">Here's your market overview for today</p>
       </div>
 
