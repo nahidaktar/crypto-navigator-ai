@@ -10,13 +10,6 @@ const FEATURES = [
   { icon: Wallet, title: "Multi-Wallet", desc: "Connect MetaMask, WalletConnect, Trust and more for seamless Web3 integration" },
   { icon: Sparkles, title: "Monad Integration", desc: "Explore the next-gen parallel execution blockchain with 10,000+ TPS" },
   { icon: BarChart3, title: "Forex Calendar", desc: "Real-time economic event tracking from Forex Factory for informed decisions" },
-];
-
-export default function LandingPage({ onGetStarted }: { onGetStarted: () => void }) {
-  const [showSplash, setShowSplash] = useState(false);
-
-  const handleClick = () => {
-    setShowSplash(true);
   };
 
   return (
@@ -63,7 +56,7 @@ export default function LandingPage({ onGetStarted }: { onGetStarted: () => void
         {/* Footer */}
         <footer className="relative z-10 text-center pb-8">
           <p className="text-xs text-muted-foreground/50">
-            Powered by Lovable AI • Monad Blockchain • Built for Traders
+            Powered by ggits • Monad Blockchain • Built for Traders
           </p>
         </footer>
       </div>
