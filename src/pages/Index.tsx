@@ -1,16 +1,44 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import Sidebar from "@/components/Sidebar";
+import DashboardHome from "@/components/DashboardHome";
+import AITradingPanel from "@/components/AITradingPanel";
+import AnalyticsPanel from "@/components/AnalyticsPanel";
+import PortfolioPanel from "@/components/PortfolioPanel";
+import HistoryPanel from "@/components/HistoryPanel";
+import LearnPanel from "@/components/LearnPanel";
+import AIChatPanel from "@/components/AIChatPanel";
+import MonadPanel from "@/components/MonadPanel";
+import MarketOverview from "@/components/MarketOverview";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
-  return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
-    </div>
-  );
+const PANELS: Record<string, React.FC> = {
+  dashboard: DashboardHome,
+  trading: AITradingPanel,
+  analytics: AnalyticsPanel,
+  portfolio: PortfolioPanel,
+  history: HistoryPanel,
+  learn: LearnPanel,
+  "ai-chat": AIChatPanel,
+  monad: MonadPanel,
 };
 
-const Index = PlaceholderIndex;
+export default function Index() {
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const ActivePanel = PANELS[activeTab] || DashboardHome;
+  const showMarketSidebar = ["dashboard", "trading", "analytics"].includes(activeTab);
 
-export default Index;
+  return (
+    <div className="flex min-h-screen bg-background">
+      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+      <main className="flex-1 flex">
+        <div className="flex-1 p-6 overflow-y-auto max-h-screen">
+          <ActivePanel />
+        </div>
+        {showMarketSidebar && (
+          <aside className="w-80 border-l border-border/30 p-4 overflow-y-auto max-h-screen hidden xl:block">
+            <MarketOverview />
+          </aside>
+        )}
+      </main>
+    </div>
+  );
+}
