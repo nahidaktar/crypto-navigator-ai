@@ -2,8 +2,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BarChart3, Bot, BookOpen, Wallet, History, TrendingUp,
-  Settings, ChevronLeft, ChevronRight, LayoutDashboard, Sparkles, User
+  Settings, ChevronLeft, ChevronRight, LayoutDashboard, Sparkles
 } from "lucide-react";
+import UserProfileMenu from "@/components/UserProfileMenu";
 import logo from "@/assets/logo.jpg";
 
 const NAV_ITEMS = [
@@ -17,9 +18,6 @@ const NAV_ITEMS = [
   { id: "ai-chat", label: "AI Assistant", icon: Bot },
   { id: "monad", label: "Monad", icon: Sparkles },
 ];
-
-const RANDOM_NAMES = ["CryptoKing", "MoonTrader", "DeFiWhale", "BlockHunter"];
-const randomName = RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)];
 
 interface SidebarProps {
   activeTab: string;
@@ -79,14 +77,8 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
 
       <div className="p-3 space-y-2">
         {!collapsed && (
-          <div className="px-3 py-2 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-              <User className="w-4 h-4 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium leading-none">{randomName}</p>
-              <p className="text-xs text-muted-foreground">Guest User</p>
-            </div>
+          <div className="px-3 py-2">
+            <UserProfileMenu />
           </div>
         )}
         <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-muted-foreground hover:bg-secondary transition-colors text-sm">

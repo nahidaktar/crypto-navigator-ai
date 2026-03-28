@@ -3,8 +3,6 @@ import { motion } from "framer-motion";
 import { TrendingUp, TrendingDown, Wallet, BarChart3, Brain, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { getMarketData, getAISignal, type CryptoPrice } from "@/lib/api";
 
-const RANDOM_NAMES = ["CryptoKing", "MoonTrader", "DeFiWhale", "BlockHunter", "SatoshiFan", "MonadPioneer", "AlphaTrader", "ChainMaster"];
-
 function StatCard({ icon: Icon, label, value, sub, accent }: { icon: any; label: string; value: string; sub: string; accent?: boolean }) {
   return (
     <div className={`glass-card p-5 space-y-2 ${accent ? "border-primary/30 glow-primary" : ""}`}>
@@ -23,12 +21,26 @@ function StatCard({ icon: Icon, label, value, sub, accent }: { icon: any; label:
 
 export default function DashboardHome() {
   const [topCoins, setTopCoins] = useState<CryptoPrice[]>([]);
-  const [displayName] = useState(() => RANDOM_NAMES[Math.floor(Math.random() * RANDOM_NAMES.length)]);
+  const [displayName, setDisplayName] = useState("Trader");
 
   useEffect(() => {
     setTopCoins(getMarketData().slice(0, 6));
     const id = setInterval(() => setTopCoins(getMarketData().slice(0, 6)), 5000);
     return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    import("@/integrations/supabase/client").then(async ({ supabase }) => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("user_id", session.user.id)
+          .single();
+        if (data?.display_name) setDisplayName(data.display_name);
+      }
+    });
   }, []);
 
   const signal = getAISignal("BTC");
