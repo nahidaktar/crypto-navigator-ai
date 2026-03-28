@@ -73,13 +73,7 @@ export default function LandingPage({ onGetStarted }: { onGetStarted: () => void
                 <img src={logo} alt="MonX" className="w-full h-full object-cover" />
               </div>
             </div>
-
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-4">
-              <span className="text-gradient">MonX</span>
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-2">
-              AI-Powered Crypto Trading & Web3 Intelligence Platform
-            </p>
+          
             <p className="text-sm text-muted-foreground/70 max-w-lg mx-auto mb-8">
               Real-time market analytics • AI agent workflows • Monad ecosystem • Gamified learning
             </p>
@@ -94,27 +88,7 @@ export default function LandingPage({ onGetStarted }: { onGetStarted: () => void
           </motion.div>
         </section>
 
-        {/* Features grid */}
-        <section className="relative z-10 max-w-6xl mx-auto px-6 pb-24">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-          >
-            {FEATURES.map((f, i) => (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + i * 0.1 }}
-                className="glass-card p-6 hover:border-primary/30 transition-all group cursor-pointer"
-              >
-                <f.icon className="w-8 h-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
-                <h3 className="font-bold text-sm mb-1">{f.title}</h3>
-                <p className="text-xs text-muted-foreground">{f.desc}</p>
-              </motion.div>
-            ))}
+        {/* Features grid *
           </motion.div>
         </section>
 
