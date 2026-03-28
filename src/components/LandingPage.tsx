@@ -28,11 +28,6 @@ const FEATURES = [
         </header>
 
         {/* Hero */}
-        <section className="relative z-10 flex flex-col items-center justify-center text-center px-4 pt-20 pb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
           
           
             <p className="text-sm text-muted-foreground/70 max-w-lg mx-auto mb-8">
@@ -56,7 +51,7 @@ const FEATURES = [
         {/* Footer */}
         <footer className="relative z-10 text-center pb-8">
           <p className="text-xs text-muted-foreground/50">
-            Powered by ggits • Monad Blockchain • Built for Traders
+            Powered by ggits • Monad Blockchain • Built for Monad
           </p>
         </footer>
       </div>
