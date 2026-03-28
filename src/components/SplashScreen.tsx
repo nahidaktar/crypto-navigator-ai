@@ -28,33 +28,6 @@ export default function SplashScreen({ onComplete }: { onComplete: () => void })
   }, [onComplete]);
 
   return (
-    <AnimatePresence>
-      {phase !== "done" && (
-        <motion.div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center"
-          style={{ background: "hsl(228 25% 8%)" }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          {/* Background glow orbs */}
-          <div className="absolute inset-0 overflow-hidden">
-            <motion.div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full"
-              style={{
-                background: "radial-gradient(circle, hsla(220, 90%, 56%, 0.08) 0%, transparent 70%)",
-              }}
-              animate={phase === "expanding" ? { scale: 3, opacity: 0 } : { scale: [1, 1.1, 1], opacity: 1 }}
-              transition={phase === "expanding" ? { duration: 0.8 } : { duration: 3, repeat: Infinity }}
-            />
-            <motion.div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full"
-              style={{
-                background: "radial-gradient(circle, hsla(265, 80%, 65%, 0.06) 0%, transparent 70%)",
-              }}
-              animate={{ scale: [1.1, 1, 1.1] }}
-              transition={{ duration: 4, repeat: Infinity }}
-            />
-          </div>
 
           {/* Logo */}
           <motion.div
